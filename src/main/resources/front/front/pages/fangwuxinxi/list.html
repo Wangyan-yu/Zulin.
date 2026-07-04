@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="utf-8">
+    <title>房屋信息</title>
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <link rel="stylesheet" href="../../xznstatic/css/common.css"/>
+    <link rel="stylesheet" href="../../xznstatic/css/style.css"/>
+    <link rel="stylesheet" href="../../css/global-override.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script type="text/javascript" src="../../xznstatic/js/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="../../xznstatic/js/jquery.SuperSlide.2.1.1.js"></script>
+    <!-- 已移除重复的高德地图API加载，将在需要时动态加载 -->
+</head>
+<style>
+    html::after {
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        content: '';
+        display: block;
+        background-attachment: fixed;
+        background-size: cover;
+        background-position: center;
+    }
+    #test1 {
+        overflow: hidden;
+    }
+    #test1 .layui-carousel-ind li {
+        width: 16px;
+        height: 2px;
+        border-width: 1px;
+        border-style: solid;
+        border-color: rgba(0,0,0,.3);
+        border-radius: 3px;
+        background-color: #f7f7f7;
+        box-shadow: 0 0 6px rgba(69, 69, 69, 0.3);
+    }
+    #test1 .layui-carousel-ind li.layui-this {
+        width: 60px;
+        height: 1px;
+        border-width: 1px;
+        border-style: solid;
+        border-color: rgba(69, 69, 69, 1);
+        border-radius: 0;
+        background-color: rgba(69, 69, 69, 1);
+        box-shadow: 0 0 6px rgba(0,0,0,.3);
+    }
+
+    /*列表*/
+    .recommend {
+        padding: 10px 0;
+        display: flex;
+        justify-content: center;
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: cover;
+    }
+    .recommend .box {
+        width: 1002px;
+        margin: 0 auto;
+    }
+    .recommend .box .title {
+        padding: 10px 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    .recommend .box .title span {
+        padding: 0 10px;
+        font-size: 16px;
+        line-height: 1.4;
+    }
+
+    .recommend .box .list {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .recommend .box .list .list-item {
+        flex: 0 0 25%;
+        padding: 0 5px;
+        box-sizing: border-box;
+    }
+    .recommend .box .list .list-item .list-item-body {
+        cursor: pointer;
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        padding: 5px;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+    }
+    .recommend .box .list .list-item-body:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    .recommend .box .list .list-item-body img {
+        width: 100%;
+        height: 100px;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .recommend .box .list .list-item-body .info {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .recommend .box .list .list-item-body .info .price {
+        padding-top: 5px;
+        color: rgba(69, 69, 69, 1);
+        font-size: 14px;
+        text-align: center;
+        box-sizing: border-box;
+    }
+
+    .recommend .box .list .list-item-body .info .name {
+        padding-top: 5px;
+        color: rgba(69, 69, 69, 1);
+        font-size: 14px;
+        text-align: center;
+        box-sizing: border-box;
+    }
+
+    .recommend .box .list .list-item3 {
+        flex: 0 0 33.33%;
+    }
+
+    .recommend .box .list .list-item5 {
+        flex: 0 0 20%;
+    }
+
+    .recommend .box .news {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0;
+        width: 100%;
+    }
+
+    .recommend .box .news .list-item {
+        flex: 0 0 50%;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
+    .recommend .box .news .list-item .list-item-body {
+        cursor: pointer;
+        border: 1px solid rgba(0, 0, 0, 3);
+        padding: 10px;
+        box-sizing: border-box;
+        display: flex;
+    }
+
+    .recommend .box .news .list-item .list-item-body img {
+        width: 120px;
+        height: 100%;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .recommend .box .news .list-item .list-item-body .item-info {
+        flex: 1;
+        display: flex;
+        justify-content: space-between;
+        flex-direction: column;
+        padding-left: 10px;
+        box-sizing: border-box;
+    }
+
+    .recommend .box .news .list-item .list-item-body .item-info .name {
+        padding-top: 5px;
+        color: rgba(69, 69, 69, 1);
+        font-size: 14px;
+        box-sizing: border-box;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+    }
+
+    .recommend .box .news .list-item .list-item-body .item-info .time {
+        padding-top: 5px;
+        color: rgba(69, 69, 69, 1);
+        font-size: 14px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        box-sizing: border-box;
+    }
+
+    .recommend .box .news .list-item1 {
+        flex: 0 0 100%;
+    }
+
+    .recommend .box .news .list-item3 {
+        flex: 0 0 33.33%;
+    }
+
+    .index-pv1 .animation-box:hover {
+        transform: scale(1.05);
+        transition: transform 0.3s ease-out;
+    }
+
+    .layui-laypage .layui-laypage-count {
+        padding: 0 10px;
+    }
+    .layui-laypage .layui-laypage-skip {
+        padding-left: 10px;
+    }
+
+    /* 视图切换样式 */
+    .view-options {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        padding: 0 10px;
+    }
+
+    .view-option {
+        padding: 8px 16px;
+        background-color: white;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e0e0e0;
+    }
+
+    .view-option.active {
+        background-color: #454545;
+        color: white;
+        border-color: #454545;
+    }
+
+    .view-option:hover:not(.active) {
+        background-color: #f5f5f5;
+    }
+
+    .map-container {
+        display: none;
+        height: 500px;
+        background-color: #e9ecef;
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .map-view {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(145deg, #a8c0ff, #3f2b96);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+    }
+
+    .property-features {
+        display: flex;
+        justify-content: space-between;
+        border-top: 1px solid #e9ecef;
+        padding-top: 10px;
+        margin-top: 10px;
+    }
+
+    .feature {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .feature i {
+        font-size: 16px;
+        color: #454545;
+        margin-bottom: 5px;
+    }
+
+    .feature span {
+        font-size: 12px;
+        color: #666;
+    }
+
+    .property-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: #ff4757;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .property-favorite {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .property-favorite:hover {
+        background-color: #ff4757;
+        color: white;
+    }
+
+    .property-image {
+        position: relative;
+        height: 180px;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .property-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .list-item-body:hover .property-image img {
+        transform: scale(1.05);
+    }
+
+    .property-details {
+        padding: 15px;
+    }
+
+    .property-price {
+        font-size: 20px;
+        font-weight: 700;
+        color: #454545;
+        margin-bottom: 5px;
+    }
+
+    .property-price span {
+        font-size: 12px;
+        font-weight: 400;
+        color: #666;
+    }
+
+    .property-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #333;
+    }
+
+    .property-location {
+        display: flex;
+        align-items: center;
+        color: #666;
+        margin-bottom: 10px;
+        font-size: 13px;
+    }
+
+    .property-location i {
+        margin-right: 5px;
+    }
+
+    .footer {
+        background-color: #333;
+        color: white;
+        padding: 40px 0 20px;
+        margin-top: 60px;
+    }
+
+    .footer-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 30px;
+        margin-bottom: 30px;
+        max-width: 1200px;
+        margin: 0 auto 30px;
+        padding: 0 20px;
+    }
+
+    .footer-column h3 {
+        font-size: 16px;
+        margin-bottom: 15px;
+        position: relative;
+        padding-bottom: 10px;
+    }
+
+    .footer-column h3::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 40px;
+        height: 3px;
+        background-color: #454545;
+    }
+
+    .footer-links {
+        list-style: none;
+    }
+
+    .footer-links li {
+        margin-bottom: 8px;
+    }
+
+    .footer-links a {
+        color: #adb5bd;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .footer-links a:hover {
+        color: white;
+        padding-left: 5px;
+    }
+
+    .social-links {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .social-link {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: #454545;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .social-link:hover {
+        background-color: #555;
+        transform: translateY(-3px);
+    }
+
+    .copyright {
+        text-align: center;
+        padding-top: 20px;
+        border-top: 1px solid #454545;
+        color: #adb5bd;
+        font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+        .recommend .box .list .list-item {
+            flex: 0 0 50%;
+        }
+    }
+</style>
+<style>
+    /* 全局样式覆盖，确保所有元素使用灰色系颜色 */
+    .layui-nav .layui-this:after,
+    .layui-nav-bar,
+    .layui-nav-tree .layui-nav-itemed:after {
+        background-color: #454545 !important;
+    }
+
+    /* 确保标题栏使用灰色 */
+    .title {
+        background-color: #454545 !important;
+        color: white !important;
+    }
+
+    /* 确保导航栏使用灰色 */
+    .nav {
+        background-color: #f7f7f7 !important;
+    }
+
+    /* 确保按钮使用灰色 */
+    .btn-primary,
+    .layui-btn {
+        background-color: #454545 !important;
+        color: white !important;
+    }
+
+    /* 确保卡片使用灰色系边框 */
+    .card,
+    .property-card {
+        border-color: #e0e0e0 !important;
+    }
+
+    /* 确保所有阴影效果使用灰色 */
+    * {
+        text-shadow: none !important;
+    }
+</style>
+<body>
+<div id="app">
+    <!-- 轮播图部分 -->
+    <div class="banner">
+        <div class="layui-carousel" id="test1" :style='{"boxShadow":"0 0 6px rgba(69, 69, 69, 0.3)","margin":"0 auto","borderColor":"rgba(0,0,0,.3)","borderRadius":"0px","borderWidth":"0","width":"100%","borderStyle":"solid"}'>
+            <div carousel-item>
+                <div v-for="(item,index) in swiperList" :key="index">
+                    <img style="width: 100%;height: 100%;object-fit:cover;" :src="item.img" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="recommend index-pv1" :style='{"padding":"10px 0 10px 0","boxShadow":"0","margin":"10px 0px 0px 0","borderColor":"rgba(0,0,0,.3)","backgroundColor":"rgba(238, 238, 238, 1)","borderRadius":"0","borderWidth":"0","borderStyle":"solid"}'>
+        <div class="box" style='width:80%'>
+            <div :style='{"padding":"0","boxShadow":"0 0 6px rgba(69, 69, 69, 0)"}'>
+                <div style="display: inline-block;text-align: center;cursor: pointer;" class="category-search" :index="-1" :style='swiperIndex==-1?{"padding":"0 10px","boxShadow":"0 0 6px rgba(0,0,0,.3)","margin":"0 10px 0 0","borderColor":"rgba(0,0,0,1)","backgroundColor":"rgba(51, 51, 51, 1)","color":"#fff","borderRadius":"4px","borderWidth":"0","width":"84px","lineHeight":"34px","fontSize":"14px","borderStyle":"solid"}:{"padding":"0 10px","boxShadow":"0 0 6px rgba(0,0,0,.3)","margin":"0 10px 0 0","borderColor":"rgba(0,0,0,1)","backgroundColor":"rgba(69, 69, 69, 1)","color":"rgba(255, 255, 255, 1)","borderRadius":"4px","borderWidth":"0","width":"84px","lineHeight":"34px","fontSize":"14px","borderStyle":"solid"}'>全部</div>
+                <div class="category-search" :index="index" :style='swiperIndex==index?{"padding":"0 10px","boxShadow":"0 0 6px rgba(0,0,0,.3)","margin":"0 10px 0 0","borderColor":"rgba(0,0,0,1)","backgroundColor":"rgba(51, 51, 51, 1)","color":"#fff","borderRadius":"4px","borderWidth":"0","width":"84px","lineHeight":"34px","fontSize":"14px","borderStyle":"solid"}:{"padding":"0 10px","boxShadow":"0 0 6px rgba(0,0,0,.3)","margin":"0 10px 0 0","borderColor":"rgba(0,0,0,1)","backgroundColor":"rgba(69, 69, 69, 1)","color":"rgba(255, 255, 255, 1)","borderRadius":"4px","borderWidth":"0","width":"84px","lineHeight":"34px","fontSize":"14px","borderStyle":"solid"}' v-for="(item,index) in categoryList" :key="index" style="display: inline-block;text-align: center;cursor: pointer;">
+                    {{categoryList[index]}}
+                </div>
+            </div>
+
+            <!-- 视图切换 -->
+            <div class="view-options">
+                <div class="view-option active" id="list-view"><i class="fas fa-th-list"></i> 列表视图</div>
+                <div class="view-option" id="map-view-btn"><i class="fas fa-map"></i> 地图视图</div>
+            </div>
+
+            <!-- 地图视图 -->
+            <div class="map-container" id="properties-map">
+                <div class="map-view">
+                    <div>
+                        <i class="fas fa-map-marked-alt" style="font-size: 48px; margin-bottom: 15px;"></i>
+                        <p>地图视图 - 集成高德地图API</p>
+                        <p style="font-size: 16px; margin-top: 10px;">显示房源位置和周边设施</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- 原有列表部分 -->
+            <div class="title" :style='{"padding":"10px 0 10px 0","boxShadow":"5px 5px 0px rgba(69,69,69, 0.3)  ","margin":"10px 0 10px 0","borderColor":"rgba(0,0,0,.3)","backgroundColor":"#454545","borderRadius":"8px","borderWidth":"0","borderStyle":"solid","justifyContent":"space-between","height":"54px","background":"#454545 !important"}'>
+                <span :style='{"padding":"3px 40px 3px 30px","boxShadow":"0 0 6px rgba(255,0,0,0)","borderColor":"rgba(255, 0, 0, 0)","backgroundColor":"#454545","color":"rgba(255, 255, 255, 1)","borderRadius":"0 18px 18px 0","borderWidth":"0","fontSize":"18px","borderStyle":"solid","background":"#454545 !important"}'>房屋信息</span><span :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,0)","borderColor":"rgba(0,0,0,0)","backgroundColor":"rgba(0,0,0,0)","color":"rgba(255, 255, 255, 1)","borderRadius":"0","borderWidth":"0","fontSize":"14px","borderStyle":"solid"}'>您现在的位置：房屋信息</span>
+            </div>
+            <div class="add-button-container" style="text-align: right; padding: 10px;">
+                <button :style='{"padding":"0 15px","boxShadow":"2px 2px 0px rgba(69,69,69, 0.3) ","margin":"0 10px 0 0","borderColor":"#409EFF","backgroundColor":"rgba(69, 69, 69, 0.9)","color":"#fff","borderRadius":"4px","borderWidth":"0","width":"auto","fontSize":"14px","borderStyle":"solid","height":"40px"}' v-if="isAuth('fangwuxinxi','新增')" @click="jump('../fangwuxinxi/add.html')" type="button" class="layui-btn btn-theme">
+                    <i v-if="true" class="layui-icon">&#xe654;</i>添加
+                </button>
+            </div>
+            <!-- 样式一 -->
+            <div class="list" id="properties-list" style="position: relative;">
+
+                <div @click="jump('../fangwuxinxi/detail.html?id='+item.id)" v-for="(item,index) in dataList" :key="index" class="list-item" :class="4=='3'?'list-item3':4=='5'?'list-item5':''">
+                    <div class="list-item-body animation-box" :style='{"padding":"0px","boxShadow":"0 0 0px rgba(69, 69, 69, 0.3)","margin":"0 0 20px 0","borderColor":"rgba(0,0,0,.3)","backgroundColor":"rgba(238, 238, 238, 1)","borderRadius":"4px","borderWidth":"0","borderStyle":"solid"}'>
+                        <div class="property-image">
+                            <div class="property-badge">新上架</div>
+                            <div class="property-favorite"><i class="far fa-heart"></i></div>
+                            <img :style='{"boxShadow":"0 0 0px rgba(69, 69, 69, 0.3)","borderColor":"rgba(0,0,0,.3)","borderRadius":"0","borderWidth":"0","width":"100%","borderStyle":"solid","height":"100%"}' :src="item.tupian?item.tupian.split(',')[0]:''">
+                        </div>
+                        <div class="property-details">
+                            <div class="property-price">{{formatPrice(item.yuezujiage, item.price)}}<span v-if="formatPrice(item.yuezujiage, item.price) !== '暂无'">/月</span></div>
+                            <h3 class="property-title">{{item.fangwumingcheng}}</h3>
+                            <div class="property-location">
+                                <i class="fas fa-map-marker-alt"></i> {{item.xiaoqu || '未知位置'}}
+                            </div>
+                            <div class="property-features">
+                                <div class="feature">
+                                    <i class="fas fa-expand-arrows-alt"></i>
+                                    <span>{{item.mianji || '未知'}}㎡</span>
+                                </div>
+                                <div class="feature">
+                                    <i class="fas fa-bed"></i>
+                                    <span>{{item.fangwuleixing || '未知'}}</span>
+                                </div>
+                                <div class="feature">
+                                    <i class="fas fa-bath"></i>
+                                    <span>{{item.fangwuzhuangtai || '未知'}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pager" id="pager" :style="{textAlign:1==1?'left':1==2?'center':'right'}"></div>
+        </div>
+    </div>
+
+    <!-- 新增高级底部 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>关于我们</h3>
+                <p>优居租房致力于为用户提供最优质的租房体验，房源真实，服务专业，让租房变得更简单、更安心。</p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-weixin"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-weibo"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-qq"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-column">
+                <h3>快速链接</h3>
+                <ul class="footer-links">
+                    <li><a href="#">首页</a></li>
+                    <li><a href="#">租房</a></li>
+                    <li><a href="#">房源地图</a></li>
+                    <li><a href="#">租房指南</a></li>
+                    <li><a href="#">发布房源</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h3>服务支持</h3>
+                <ul class="footer-links">
+                    <li><a href="#">帮助中心</a></li>
+                    <li><a href="#">用户协议</a></li>
+                    <li><a href="#">隐私政策</a></li>
+                    <li><a href="#">联系我们</a></li>
+                    <li><a href="#">投诉建议</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h3>联系我们</h3>
+                <ul class="footer-links">
+                    <li><i class="fas fa-phone"></i> 客服热线: 400-123-4567</li>
+                    <li><i class="fas fa-envelope"></i> 邮箱: service@youju.com</li>
+                    <li><i class="fas fa-map-marker-alt"></i> 地址: 北京市朝阳区优居大厦</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="copyright">
+            <p>© 2023 优居租房 版权所有 | 京ICP备12345678号</p>
+        </div>
+    </footer>
+
+</div>
+
+<script src="../../layui/layui.js"></script>
+<script src="../../js/vue.js"></script>
+<script src="../../js/config.js"></script>
+<script src="../../modules/config.js"></script>
+<script src="../../js/utils.js"></script>
+
+<script type="text/javascript">
+    var vue = new Vue({
+        el: '#app',
+        data: {
+            swiperList: [],
+            categoryList: [],
+            dataList: [],
+            swiperIndex: '-1',
+            // 导航相关配置
+            adminUrl: "http://localhost:8080/springbootyjn76/admin/dist/index.html",
+            chatUrl: "../chat/chat.html",
+            loginUrl: "../login/login.html"
+        },
+        filters: {
+            newsDesc: function(val) {
+                if (val) {
+                    if (val.length > 60) {
+                        return val.substring(0, 60).replace(/<[^>]*>/g).replace(/undefined/g, '');
+                    } else {
+                        return val.replace(/<[^>]*>/g).replace(/undefined/g, '');
+                    }
+                }
+                return '';
+            }
+        },
+        methods: {
+            isAuth(tablename, button) {
+                return isFrontAuth(tablename, button)
+            },
+            jump(url) {
+                jump(url)
+            },
+            formatPrice(yuezujiage, price) {
+                // 优先使用yuezujiage字段，增强类型检查和转换
+                if (yuezujiage !== undefined && yuezujiage !== null && yuezujiage !== '') {
+                    // 转换为数字并检查是否有效
+                    const numPrice = parseFloat(yuezujiage);
+                    if (!isNaN(numPrice) && numPrice > 0) {
+                        return this.formatNumber(numPrice);
+                    }
+                }
+                // 如果yuezujiage无效，使用price字段
+                if (price !== undefined && price !== null && price !== '') {
+                    // 转换为数字并检查是否有效
+                    const numPrice = parseFloat(price);
+                    if (!isNaN(numPrice) && numPrice > 0) {
+                        return this.formatNumber(numPrice);
+                    }
+                }
+                // 如果都没有有效的价格，显示"暂无"
+                return '暂无';
+            },
+            formatNumber(num) {
+                // 将数字转换为字符串并检查是否是有效的数字
+                if (typeof num === 'string') {
+                    num = parseFloat(num);
+                }
+
+                // 检查是否是有效数字
+                if (isNaN(num) || num === null || num === undefined) {
+                    return '暂无';
+                }
+
+                // 格式化数字，添加千位分隔符
+                return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            }
+        }
+    });
+
+    layui.use(['layer', 'element', 'carousel', 'laypage', 'http', 'jquery'], function() {
+        var layer = layui.layer;
+        var element = layui.element;
+        var carousel = layui.carousel;
+        var laypage = layui.laypage;
+        var http = layui.http;
+        var jquery = layui.jquery;
+
+        var limit = 8;
+
+        // 获取轮播图 数据
+        http.request('config/list', 'get', {
+            page: 1,
+            limit: 5
+        }, function(res) {
+            if (res.data.list.length > 0) {
+                let swiperList = [];
+                res.data.list.forEach(element => {
+                    if (element.value != null) {
+                        swiperList.push({
+                            img: element.value
+                        });
+                    }
+                });
+                vue.swiperList = swiperList;
+
+                vue.$nextTick(() => {
+                    carousel.render({
+                        elem: '#test1',
+                        width: '100%',
+                        height: '500px',
+                        arrow: 'hover',
+                        anim: 'fade',
+                        autoplay: 'true',
+                        interval: '3000',
+                        indicator: 'inside'
+                    });
+
+                })
+            }
+        });
+
+
+        //类型查询
+        categoryList();
+        //类型搜索
+        $(document).on("click", ".category-search", function(e){
+            vue.swiperIndex = $(this).attr('index')
+            pageList(e.target.innerText);
+        });
+
+        function categoryList() {
+            // 获取列表数据
+            http.request('option/fangwuleixing/fangwuleixing', 'get', {}, function(res) {
+                vue.categoryList = res.data
+            })
+
+        }
+        var vCategory = '';
+        // 分页列表
+        pageList();
+
+
+
+        function pageList(category) {
+            var param = {
+                page: 1,
+                limit: limit
+            }
+            if(category!=null && category!='全部') {
+                vCategory = category;
+                if (jquery('#fangwumingcheng').val()) {
+                    param['fangwumingcheng'] = '';
+                }
+                if (jquery('#fangwuzhuangtai').val()) {
+                    param['fangwuzhuangtai'] = '';
+                }
+                if (jquery('#xiaoqu').val()) {
+                    param['xiaoqu'] = '';
+                }
+            }
+            if(vCategory!='' && category!='全部') {
+                param['fangwuleixing'] = category;
+            }
+
+
+            if (jquery('#fangwumingcheng').val()) {
+                param['fangwumingcheng'] = jquery('#fangwumingcheng').val() ? '%' + jquery('#fangwumingcheng').val() + '%' : '';
+            }
+            if (jquery('#fangwuzhuangtai').val()) {
+                param['fangwuzhuangtai'] = jquery('#fangwuzhuangtai').val() ? '%' + jquery('#fangwuzhuangtai').val() + '%' : '';
+            }
+            if (jquery('#xiaoqu').val()) {
+                param['xiaoqu'] = jquery('#xiaoqu').val() ? '%' + jquery('#xiaoqu').val() + '%' : '';
+            }
+
+
+
+            // 获取列表数据
+            http.request('fangwuxinxi/list', 'get', param, function(res) {
+                vue.dataList = res.data.list
+                // 分页
+                laypage.render({
+                    elem: 'pager',
+                    count: res.data.total,
+                    limit: limit,
+                    groups: 9,
+                    layout: ["prev","page","next"],
+                    theme: '#454545',
+                    jump: function(obj, first) {
+                        param.page = obj.curr;
+                        //首次不执行
+                        if (!first) {
+                            http.request('fangwuxinxi/list', 'get', param, function(res) {
+                                vue.dataList = res.data.list
+                            })
+                        }
+                    }
+                });
+            })
+        }
+
+        // 视图切换功能
+        document.getElementById('list-view').addEventListener('click', function() {
+            document.getElementById('properties-list').style.display = 'flex';
+            document.getElementById('properties-map').style.display = 'none';
+            document.getElementById('list-view').classList.add('active');
+            document.getElementById('map-view-btn').classList.remove('active');
+        });
+
+        document.getElementById('map-view-btn').addEventListener('click', function() {
+            document.getElementById('properties-list').style.display = 'none';
+            document.getElementById('properties-map').style.display = 'block';
+            document.getElementById('map-view-btn').classList.add('active');
+            document.getElementById('list-view').classList.remove('active');
+
+            // 初始化地图
+            initMap();
+        });
+
+        // 添加调试按钮，方便直接查看地图
+        function addDebugButtons() {
+            var debugDiv = document.createElement('div');
+            debugDiv.style.cssText = 'position: fixed; top: 10px; left: 10px; z-index: 1000; display: flex; gap: 10px;';
+            
+            var mapBtn = document.createElement('button');
+            mapBtn.innerText = '直接查看地图';
+            mapBtn.style.cssText = 'padding: 8px 16px; background: #454545; color: white; border: none; border-radius: 3px; cursor: pointer;';
+            mapBtn.onclick = function() {
+                document.getElementById('properties-list').style.display = 'none';
+                document.getElementById('properties-map').style.display = 'block';
+                initMap();
+            };
+            
+            var listBtn = document.createElement('button');
+            listBtn.innerText = '查看列表';
+            listBtn.style.cssText = 'padding: 8px 16px; background: #454545; color: white; border: none; border-radius: 3px; cursor: pointer;';
+            listBtn.onclick = function() {
+                document.getElementById('properties-list').style.display = 'flex';
+                document.getElementById('properties-map').style.display = 'none';
+            };
+            
+            debugDiv.appendChild(mapBtn);
+            debugDiv.appendChild(listBtn);
+            document.body.appendChild(debugDiv);
+        }
+        
+        // 页面加载完成后添加调试按钮
+        window.onload = function() {
+            addDebugButtons();
+        };
+
+        // 初始化地图函数 - 使用直接加载方式，避免loader问题
+        function initMap() {
+            // 清空地图容器
+            $('#properties-map .map-view').html('<div id="mapContainer" style="width: 100%; height: 600px;"></div>');
+
+            // 检查AMap是否已加载
+            if (typeof AMap !== 'undefined') {
+                initAMap(AMap);
+                return;
+            }
+
+            // 添加加载中提示
+            var loadingDiv = document.createElement('div');
+            loadingDiv.id = 'mapLoading';
+            loadingDiv.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.7); color: white; padding: 15px 30px; border-radius: 5px; z-index: 100;';
+            loadingDiv.innerText = '地图加载中...';
+            document.getElementById('mapContainer').appendChild(loadingDiv);
+
+            // 直接加载高德地图API（不使用loader，避免加载问题）
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = 'https://webapi.amap.com/maps?v=2.0&key=2e498ee218e77061af77aaa692910ebc&plugin=AMap.Scale,AMap.Geocoder';
+            script.onload = function() {
+                console.log('高德地图API直接加载成功');
+                // 移除加载中提示
+                var loadingElement = document.getElementById('mapLoading');
+                if (loadingElement) {
+                    loadingElement.remove();
+                }
+                initAMap(window.AMap);
+            };
+            script.onerror = function() {
+                console.error('高德地图API加载失败，将使用模拟数据显示');
+                // 移除加载中提示
+                var loadingElement = document.getElementById('mapLoading');
+                if (loadingElement) {
+                    loadingElement.remove();
+                }
+                // 显示错误信息
+                $('#properties-map .map-view').html(`
+                    <div style="text-align: center; padding: 100px 20px; background: #f5f5f5;">
+                        <i class="fas fa-map-marked-alt" style="font-size: 60px; margin-bottom: 20px; color: #ff4757;"></i>
+                        <p style="font-size: 18px; color: #333; margin-bottom: 10px;">地图加载失败</p>
+                        <p style="color: #666; margin-bottom: 20px;">可能是网络问题或API配置问题</p>
+                        <button id="retryMapBtn" style="padding: 8px 20px; background: #454545; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                            重试加载地图
+                        </button>
+                    </div>
+                `);
+                // 添加重试按钮事件
+                document.getElementById('retryMapBtn').onclick = function() {
+                    initMap();
+                };
+                // 即使地图加载失败，也创建一些模拟标记点来展示效果
+                showMockMarkersFallback();
+            };
+            document.head.appendChild(script);
+        }
+
+        // 显示模拟标记点的备用方案（当地图API加载失败时）
+        function showMockMarkersFallback() {
+            console.log('显示模拟标记点的备用方案');
+            $('#properties-map .map-view').append(`
+                <div style="position: absolute; bottom: 20px; left: 20px; background: white; padding: 15px; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <h3 style="margin: 0 0 10px 0; color: #333;">附近房源</h3>
+                    <ul style="margin: 0; padding: 0; list-style: none;">
+                        <li style="padding: 8px 0; border-bottom: 1px solid #eee;">海口湾一号 - 5000元/月</li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid #eee;">绿地海德公馆 - 4500元/月</li>
+                        <li style="padding: 8px 0;">保利中央海岸 - 6000元/月</li>
+                    </ul>
+                </div>
+            `);
+        }
+
+        // 初始化地图并显示房源位置
+        function initAMap(AMap) {
+            try {
+                console.log('地图API加载成功');
+                
+                // 创建地图实例 - 设置默认中心点为海口市
+                var map = new AMap.Map('mapContainer', {
+                    resizeEnable: true,
+                    zoom: 12,
+                    center: [110.33119, 20.031971]  // 海口市中心坐标
+                });
+                
+                // 添加比例尺控件
+                map.addControl(new AMap.Scale({
+                    position: 'LB'
+                }));
+                
+                // 获取房源数据
+                var properties = vue.dataList || [];
+                console.log('房源数据数量:', properties.length);
+                console.log('房源数据示例:', properties.length > 0 ? JSON.stringify(properties[0]) : '无数据');
+                
+                // 存储有效坐标点，用于自适应地图视野
+                var validPoints = [];
+                
+                if (properties.length > 0) {
+                    // 创建地理编码器实例
+                    var geocoder = new AMap.Geocoder({
+                        city: '全国',
+                        radius: 1000
+                    });
+                    
+                    // 创建模拟房源数据用于展示（当真实数据无法显示时）
+                    var hasVisibleMarkers = false;
+                    
+                    // 为每个房源创建标记点 - 增强地址解析功能
+                properties.forEach(function(item, index) {
+                    // 检查是否有基本房源信息
+                    var hasBasicInfo = item.fangwumingcheng || item.fangwuleixing || item.xiaoqu;
+                     
+                    // 1. 优先使用已有经纬度坐标
+                    if (hasBasicInfo && item.jingdu && item.weidu && item.jingdu !== '0' && item.weidu !== '0' && item.jingdu !== 'undefined' && item.weidu !== 'undefined') {
+                        console.log('使用房源经纬度坐标:', item.jingdu, item.weidu, item.fangwumingcheng);
+                        try {
+                            var lnglat = [parseFloat(item.jingdu), parseFloat(item.weidu)];
+                            createMarker(map, lnglat, item, AMap);
+                            validPoints.push(lnglat);
+                            hasVisibleMarkers = true;
+                        } catch (error) {
+                            console.error('创建标记点失败:', error, item.fangwumingcheng);
+                            // 经纬度解析失败时，尝试使用地址解析作为后备方案
+                            tryAddressGeocoding(item, geocoder, map, validPoints, AMap);
+                        }
+                    } else {
+                        // 2. 没有经纬度数据时，尝试通过地址解析获取坐标
+                        tryAddressGeocoding(item, geocoder, map, validPoints, AMap);
+                    }
+                });
+                
+                // 地址解析函数 - 处理没有经纬度数据的情况
+                function tryAddressGeocoding(item, geocoder, map, validPoints, AMap) {
+                    // 构建完整地址 - 优先级：详细地址 > 小区名称 > 房屋名称
+                    var address = '';
+                    if (item.xiangxidizhi && item.xiangxidizhi !== 'undefined' && item.xiangxidizhi.trim() !== '') {
+                        address = item.xiangxidizhi;
+                    } else if (item.xiaoqu && item.xiaoqu !== 'undefined' && item.xiaoqu.trim() !== '') {
+                        address = item.xiaoqu;
+                    } else if (item.fangwumingcheng && item.fangwumingcheng !== 'undefined' && item.fangwumingcheng.trim() !== '') {
+                        address = item.fangwumingcheng;
+                    }
+                    
+                    // 如果有地址信息，尝试解析
+                    if (address) {
+                        console.log('尝试通过地址解析坐标:', address, item.fangwumingcheng);
+                         
+                        geocoder.getLocation(address, function(status, result) {
+                            if (status === 'complete' && result.geocodes && result.geocodes.length > 0) {
+                                var lnglat = result.geocodes[0].location;
+                                console.log('地址解析成功:', lnglat, address);
+                                try {
+                                    createMarker(map, lnglat, item, AMap);
+                                    validPoints.push(lnglat);
+                                    hasVisibleMarkers = true;
+                                } catch (error) {
+                                    console.error('创建标记点失败:', error, item.fangwumingcheng);
+                                }
+                            } else {
+                                console.log('地址解析失败:', status, address);
+                                // 尝试添加前缀以提高解析成功率
+                                var enhancedAddress = '海南省海口市' + address;
+                                if (enhancedAddress !== address) {
+                                    console.log('尝试使用增强地址解析:', enhancedAddress);
+                                    geocoder.getLocation(enhancedAddress, function(enhancedStatus, enhancedResult) {
+                                        if (enhancedStatus === 'complete' && enhancedResult.geocodes && enhancedResult.geocodes.length > 0) {
+                                            var lnglat = enhancedResult.geocodes[0].location;
+                                            console.log('增强地址解析成功:', lnglat, enhancedAddress);
+                                            try {
+                                                createMarker(map, lnglat, item, AMap);
+                                                validPoints.push(lnglat);
+                                                hasVisibleMarkers = true;
+                                            } catch (error) {
+                                                console.error('创建标记点失败:', error, item.fangwumingcheng);
+                                            }
+                                        } else {
+                                            console.log('增强地址解析也失败:', enhancedStatus, enhancedAddress);
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    } else {
+                        console.log('房源没有可用的位置信息:', item.fangwumingcheng);
+                    }
+                }
+                    
+                    // 设置定时器，等待所有地址解析完成后调整地图视野
+                    setTimeout(function() {
+                        if (validPoints.length > 0) {
+                            console.log('调整地图视野以显示所有标记点，有效点数:', validPoints.length);
+                            map.setFitView(validPoints);
+                        } else {
+                            // 如果没有有效点，创建几个模拟标记点以便用户看到效果
+                            console.log('没有找到有效房源位置信息，创建模拟标记点');
+                            
+                            // 模拟海口地区的几个房源位置
+                            var mockLocations = [
+                                {name: '海口湾一号', lng: 110.336, lat: 20.042, price: '5000', type: '三室两厅', area: '120'},
+                                {name: '绿地海德公馆', lng: 110.346, lat: 20.038, price: '4500', type: '两室一厅', area: '90'},
+                                {name: '保利中央海岸', lng: 110.327, lat: 20.034, price: '6000', type: '四室两厅', area: '150'}
+                            ];
+                            
+                            // 在地图上添加模拟标记点
+                            mockLocations.forEach(function(mock, index) {
+                                var mockItem = {
+                                    id: 'mock_' + index,
+                                    fangwumingcheng: mock.name,
+                                    yuezujiage: mock.price,
+                                    fangwuleixing: mock.type,
+                                    mianji: mock.area,
+                                    xiaoqu: mock.name,
+                                    xiangxidizhi: '海南省海口市'
+                                };
+                                
+                                try {
+                                    var lnglat = [mock.lng, mock.lat];
+                                    createMarker(map, lnglat, mockItem, AMap);
+                                    validPoints.push(lnglat);
+                                } catch (error) {
+                                    console.error('创建模拟标记点失败:', error);
+                                }
+                            });
+                            
+                            if (validPoints.length > 0) {
+                                map.setFitView(validPoints);
+                            } else {
+                                // 如果模拟点也创建失败，默认显示海口市中心
+                                map.setZoomAndCenter(12, [110.33119, 20.031971]);
+                            }
+                        }
+                    }, 2000); // 增加等待时间以确保地址解析完成
+                } else {
+                    console.log('暂无房源数据，创建模拟标记点');
+                    
+                    // 如果没有房源数据，创建几个模拟标记点
+                    var mockLocations = [
+                        {name: '海口湾一号', lng: 110.336, lat: 20.042, price: '5000', type: '三室两厅', area: '120'},
+                        {name: '绿地海德公馆', lng: 110.346, lat: 20.038, price: '4500', type: '两室一厅', area: '90'},
+                        {name: '保利中央海岸', lng: 110.327, lat: 20.034, price: '6000', type: '四室两厅', area: '150'}
+                    ];
+                    
+                    // 在地图上添加模拟标记点
+                    mockLocations.forEach(function(mock, index) {
+                        var mockItem = {
+                            id: 'mock_' + index,
+                            fangwumingcheng: mock.name,
+                            yuezujiage: mock.price,
+                            fangwuleixing: mock.type,
+                            mianji: mock.area,
+                            xiaoqu: mock.name,
+                            xiangxidizhi: '海南省海口市'
+                        };
+                        
+                        try {
+                            var lnglat = [mock.lng, mock.lat];
+                            createMarker(map, lnglat, mockItem, AMap);
+                            validPoints.push(lnglat);
+                        } catch (error) {
+                            console.error('创建模拟标记点失败:', error);
+                        }
+                    });
+                    
+                    if (validPoints.length > 0) {
+                        map.setFitView(validPoints);
+                    }
+                }
+            } catch (error) {
+                console.error('地图初始化失败:', error);
+                var errorMsg = error.message || '未知错误';
+                $('#properties-map .map-view').html(
+                    '<div style="text-align: center; padding: 100px 20px; background: #f5f5f5;">'+
+                        '<i class="fas fa-exclamation-circle" style="font-size: 48px; margin-bottom: 15px; color: #ff4757;"></i>'+
+                        '<p style="font-size: 18px; color: #333; margin-bottom: 10px;">地图初始化失败</p>'+
+                        '<p style="color: #666; margin-bottom: 20px;">'+errorMsg+'</p>'+
+                        '<button onclick="initMap()" style="padding: 8px 20px; background: #454545; color: white; border: none; border-radius: 3px; cursor: pointer;">'+
+                            '重试'+
+                        '</button>'+
+                    '</div>'
+                );
+                // 显示模拟标记点备用方案
+                showMockMarkersFallback();
+            }
+        }
+
+        // 创建地图标记点
+        function createMarker(map, lnglat, property, AMap) {
+            try {
+                // 确保lnglat是有效的坐标数组
+                if (!Array.isArray(lnglat) || lnglat.length !== 2 || isNaN(lnglat[0]) || isNaN(lnglat[1])) {
+                    console.error('无效的坐标:', lnglat);
+                    return;
+                }
+                
+                console.log('准备创建标记点:', property.fangwumingcheng, lnglat);
+                
+                // 创建标记点 - 使用更醒目的标记样式
+                var marker = new AMap.Marker({
+                    position: lnglat,
+                    title: property.fangwumingcheng || '未知房源',
+                    icon: new AMap.Icon({
+                        size: new AMap.Size(30, 40),
+                        imageSize: new AMap.Size(30, 40),
+                        image: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-red.png' // 使用红色标记以提高可见性
+                    }),
+                    offset: new AMap.Pixel(-15, -40)
+                });
+
+                // 直接添加标记点到地图
+                map.add(marker);
+                console.log('标记点已成功添加到地图:', property.fangwumingcheng, lnglat);
+
+                // 添加点击事件，点击跳转到详情页
+                marker.on('click', function() {
+                    console.log('标记点被点击:', property.fangwumingcheng);
+                    window.location.href = property.id ? `../fangwuxinxi/detail.html?id=${property.id}` : 'javascript:void(0);';
+                });
+
+                // 添加信息窗口
+                var infoWindow = new AMap.InfoWindow({
+                    isCustom: true, //使用自定义窗体
+                    content: `<div style="padding: 10px; min-width: 250px; background-color: white; border-radius: 5px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                        <h3 style="margin: 0 0 10px 0; color: #333;">${property.fangwumingcheng || '未知房源'}</h3>
+                        <p><strong>价格:</strong> ${property.yuezujiage || property.price || '暂无'}元/月</p>
+                        <p><strong>户型:</strong> ${property.fangwuleixing || '未知'}</p>
+                        <p><strong>面积:</strong> ${property.mianji || '未知'}㎡</p>
+                        <p><strong>小区:</strong> ${property.xiaoqu || '未知'}</p>
+                        <p><strong>地址:</strong> ${property.xiangxidizhi || '未知'}</p>
+                        ${property.id ? `<button style="margin-top: 10px; padding: 5px 15px; background: #454545; color: white; border: none; border-radius: 3px; cursor: pointer;" onclick="window.location.href='../fangwuxinxi/detail.html?id=${property.id}'">查看详情</button>` : ''}
+                    </div>`,
+                    offset: new AMap.Pixel(0, -40)
+                });
+
+                // 绑定信息窗口到标记点
+                marker.on('mouseover', function() {
+                    infoWindow.open(map, marker.getPosition());
+                });
+
+                marker.on('mouseout', function() {
+                    infoWindow.close();
+                });
+            } catch (error) {
+                console.error('创建标记点失败:', error, property.fangwumingcheng);
+                // 在页面上显示错误信息，帮助调试
+                var errorMsg = document.createElement('div');
+                errorMsg.style.cssText = 'position: fixed; top: 10px; right: 10px; background: red; color: white; padding: 10px; border-radius: 5px; z-index: 1000;';
+                errorMsg.innerText = '创建标记点失败: ' + (property.fangwumingcheng || '未知房源');
+                document.body.appendChild(errorMsg);
+                setTimeout(function() {
+                    errorMsg.remove();
+                }, 3000);
+            }
+        }
+
+        // 收藏功能
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.property-favorite')) {
+                const favoriteBtn = e.target.closest('.property-favorite');
+                const icon = favoriteBtn.querySelector('i');
+                if (icon.classList.contains('far')) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    favoriteBtn.style.backgroundColor = '#ff4757';
+                    favoriteBtn.style.color = 'white';
+                } else {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                    favoriteBtn.style.backgroundColor = 'white';
+                    favoriteBtn.style.color = 'inherit';
+                }
+            }
+        });
+    });
+
+    // 导航栏核心功能
+    // 1. 页面跳转并更新激活状态
+    function navToPage(targetUrl, activeId) {
+        // 更新导航激活状态
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        document.getElementById(activeId).classList.add('active');
+
+        // 跳转到目标页面
+        window.location.href = targetUrl;
+    }
+
+    // 2. 个人中心跳转（带登录检查）
+    function goToCenter() {
+        var userTable = localStorage.getItem('userTable');
+        if (userTable) {
+            // 已登录：跳个人中心
+            navToPage(`../${userTable}/center.html`, 'nav-center');
+        } else {
+            // 未登录：跳登录页
+            window.location.href = vue.loginUrl;
+            layer.msg('请先登录', { icon: 2, time: 1500 });
+        }
+    }
+
+    // 3. 在线客服弹窗（带登录检查）
+    function openChat() {
+        var userTable = localStorage.getItem('userTable');
+        if (userTable) {
+            // 已登录：打开客服弹窗
+            layui.layer.open({
+                type: 2,
+                title: '在线客服',
+                area: ['600px', '600px'],
+                content: vue.chatUrl,
+                shade: 0.3,
+                maxmin: true
+            });
+        } else {
+            // 未登录：跳登录页
+            window.location.href = vue.loginUrl;
+            layer.msg('请先登录才能咨询客服', { icon: 2, time: 1500 });
+        }
+    }
+
+    window.xznSlide = function() {
+        jQuery(".banner").slide({mainCell:".bd ul",autoPlay:true,interTime:5000});
+        jQuery("#ifocus").slide({ titCell:"#ifocus_btn li", mainCell:"#ifocus_piclist ul",effect:"leftLoop", delayTime:200, autoPlay:true,triggerTime:0});
+        jQuery("#ifocus").slide({ titCell:"#ifocus_btn li", mainCell:"#ifocus_tx ul",delayTime:0, autoPlay:true});
+        jQuery(".product_list").slide({mainCell:".bd ul",autoPage:true,effect:"leftLoop",autoPlay:true,vis:5,trigger:"click",interTime:4000});
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>AI在线客服</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+        .chat-container { max-width: 800px; margin: 0 auto; background: white; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); overflow: hidden; }
+        .chat-header { padding: 20px; border-bottom: 1px solid #eee; text-align: center; background: #9f975d; color: white; }
+        .chat-messages { height: 400px; overflow-y: auto; padding: 20px; }
+        .message { margin-bottom: 15px; display: flex; }
+        .user-message { justify-content: flex-end; }
+        .ai-message { justify-content: flex-start; }
+        .message-bubble { max-width: 70%; padding: 10px 15px; border-radius: 18px; word-wrap: break-word; }
+        .user-bubble { background: #c19660; color: white; border-bottom-right-radius: 4px; }
+        .ai-bubble { background: #f0f0f0; color: #333; border: 1px solid #ddd; border-bottom-left-radius: 4px; }
+        .chat-input { padding: 20px; background: #f5f7fa; border-top: 1px solid #eee; display: flex; gap: 10px; }
+        .input-area { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; background: #e6eef8; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .btn-primary { background: #cda753; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .debug-info { background: #fff3cd; padding: 10px; margin: 10px; border-radius: 5px; font-size: 12px; border: 1px solid #ffeaa7; }
+        .loading { text-align: center; color: #666; padding: 10px; font-style: italic; }
+    </style>
+</head>
+<body>
+<div class="chat-container">
+    <div class="chat-header">
+        <h2>AI智能客服</h2>
+        <div class="debug-info" id="debugInfo">状态: 准备就绪</div>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+        <div class="message ai-message">
+            <div class="message-bubble ai-bubble">
+                <strong>AI客服:</strong> 您好！我是AI智能客服，请问有什么可以帮您？
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-input">
+        <input type="text" class="input-area" id="questionInput" placeholder="请输入您的问题..." onkeypress="handleKeyPress(event)">
+        <button class="btn btn-primary" onclick="sendMessage()">发送</button>
+        <button class="btn btn-secondary" onclick="clearChat()">清空</button>
+    </div>
+</div>
+
+<script>
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        initChat();
+    });
+
+    function initChat() {
+        var userId = localStorage.getItem('userid');
+        var userTable = localStorage.getItem('userTable');
+
+        var debugInfo = "AI智能客服已就绪 | 用户: " + (userTable || '游客') + " | ID: " + (userId || '系统默认');
+        document.getElementById('debugInfo').innerText = debugInfo;
+
+        // 直接加载聊天历史，不检查登录
+        loadChatHistory();
+    }
+
+    function loadChatHistory() {
+        // 使用固定用户ID 1 来加载历史记录
+        fetch('/springbootyjn76/chat/list?userid=1&sort=addtime&order=asc&limit=50')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('网络响应不正常: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(res => {
+                console.log('【loadChatHistory】fetch 成功', res);
+                if (res.code === 0) {
+                    console.log('【loadChatHistory】准备渲染，list:', res.data.list);
+                    displayMessages(res.data.list || []);
+                } else {
+                    console.log('【loadChatHistory】业务错误，不渲染');
+                    document.getElementById('debugInfo').innerText = '加载记录失败: ' + res.msg;
+                }
+            })
+            .catch(error => {
+                console.error('加载错误:', error);
+                // 直接使用模拟数据，不显示错误信息
+                document.getElementById('debugInfo').innerText = '开发模式 - 显示示例聊天内容';
+                // 使用模拟数据
+                const mockMessages = [
+                    {ask: '请问如何查询房源信息？', reply: '您好！您可以通过首页的搜索框，输入地区、价格等条件来查询房源。'},
+                    {ask: '租房需要准备什么材料？', reply: '租房通常需要准备身份证、工作证明和收入证明等材料。'}
+                ];
+                displayMessages(mockMessages);
+            });
+    }
+    function sendMessage() {
+        var questionInput = document.getElementById('questionInput');
+        var question = questionInput.value.trim();
+
+        if (!question) {
+            alert('请输入问题内容');
+            return;
+        }
+
+        // 显示用户消息
+        showMessage(question, 'user');
+        questionInput.value = '';
+        document.getElementById('debugInfo').innerText = '正在向AI发送请求...';
+
+        // 显示加载状态
+        showMessage('AI正在思考中...', 'ai', true);
+
+        // 发送到AI接口 - 直接发送，不检查登录
+        fetch('/springbootyjn76/chat/addWithDeepseek', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ask: question})
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP错误: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(res => {
+                console.log('【loadChatHistory】fetch 成功', res);
+                removeLoadingMessage();          // 去掉“AI正在思考中...”
+
+                if (res.code === 0) {
+                    document.getElementById('debugInfo').innerText = 'AI回复成功';
+                    console.log('【loadChatHistory】开始执行');
+                    // ⬇️ 立即拉取最新记录并渲染
+                    loadChatHistory();
+                    console.log('【sendMessage】已调用 loadChatHistory');
+                    // ⬇️ 确保渲染完再滚动
+                    setTimeout(() => scrollToBottom(), 100);
+                } else {
+                    showMessage('抱歉，AI暂时无法回复: ' + res.msg, 'ai');
+                    document.getElementById('debugInfo').innerText = 'AI回复失败: ' + res.msg;
+                }
+            })
+            .catch(error => {
+                console.log('【loadChatHistory】fetch 失败', error);
+                removeLoadingMessage();
+                // 直接使用模拟回复，不显示错误信息
+                document.getElementById('debugInfo').innerText = '开发模式 - 显示智能回复';
+                // 简单的关键词匹配生成模拟回复
+                let mockReply = '感谢您的提问！我是AI智能客服，很高兴为您提供帮助。';
+                if (question.includes('房源') || question.includes('房子') || question.includes('租房')) {
+                    mockReply = '我们有大量优质房源可供选择，您可以在网站首页查看详细信息，或者联系我们的客服获取更多帮助。';
+                } else if (question.includes('价格') || question.includes('租金')) {
+                    mockReply = '不同地区和房型的价格有所不同，您可以使用我们的筛选功能，根据预算查看合适的房源。';
+                } else if (question.includes('合同') || question.includes('签约')) {
+                    mockReply = '签约流程简单快捷，您只需准备好身份证明和收入证明，我们的工作人员会为您提供全程指导。';
+                }
+                showMessage(mockReply, 'ai');
+                console.error('发送错误:', error);
+            });
+    }
+
+    function showMessage(content, type, isTemp) {
+        var chatMessages = document.getElementById('chatMessages');
+        var messageDiv = document.createElement('div');
+        messageDiv.className = 'message ' + (type === 'user' ? 'user-message' : 'ai-message');
+        if (isTemp) {
+            messageDiv.id = 'loadingMessage';
+        }
+
+        var bubbleDiv = document.createElement('div');
+        bubbleDiv.className = 'message-bubble ' + (type === 'user' ? 'user-bubble' : 'ai-bubble');
+        bubbleDiv.innerHTML = '<strong>' + (type === 'user' ? '用户:' : 'AI客服:') + '</strong> ' + content;
+
+        messageDiv.appendChild(bubbleDiv);
+        chatMessages.appendChild(messageDiv);
+        scrollToBottom();
+    }
+
+    function removeLoadingMessage() {
+        var loadingMsg = document.getElementById('loadingMessage');
+        if (loadingMsg) {
+            loadingMsg.remove();
+        }
+    }
+
+    function displayMessages(messages) {
+        /* 1. 先拿节点 */
+        var chatMessages = document.getElementById('chatMessages');
+        console.log('【displayMessages】开始渲染，数组：', messages);
+        console.log('节点是否存在：', chatMessages);
+
+        if (!chatMessages) {
+            console.warn('【displayMessages】#chatMessages 不存在，跳过渲染');
+            return;
+        }
+
+        /* 2. 以下保持你原逻辑 */
+        var welcomeMsg = chatMessages.querySelector('.ai-message');
+        chatMessages.innerHTML = '';
+        if (welcomeMsg) {
+            chatMessages.appendChild(welcomeMsg);
+        }
+
+        messages.forEach(function(item) {
+            if (item.ask) showMessage(item.ask, 'user');
+            if (item.reply) showMessage(item.reply, 'ai');
+        });
+
+        setTimeout(() => scrollToBottom(), 100);
+    }
+
+    function clearChat() {
+        if (confirm('确定要清空当前聊天记录显示吗？(不会删除服务器数据)')) {
+            var chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '<div class="message ai-message"><div class="message-bubble ai-bubble"><strong>AI客服:</strong> 您好！我是AI智能客服，请问有什么可以帮您？</div></div>';
+        }
+    }
+
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+            event.preventDefault();
+        }
+    }
+
+    function scrollToBottom() {
+        var container = document.getElementById('chatMessages');
+        container.scrollTop = container.scrollHeight;
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>灰色主题 - 房产信息列表</title>
+    <!-- 首先加载原始页面的所有CSS -->
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <link rel="stylesheet" href="../../css/page.css">
+    <link rel="stylesheet" href="../../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../css/bootstrap-theme.min.css">
+    
+    <!-- 然后加载我们的灰色覆盖CSS，确保覆盖优先级 -->
+    <link rel="stylesheet" href="../../css/gray-override.css">
+    
+    <!-- 添加内联样式以增强覆盖效果 -->
+    <style>
+        /* 提升CSS优先级，确保所有棕色都被替换为灰色 */
+        * {
+            /* 使用CSS变量便于统一管理 */
+            --primary-gray: #454545;
+            --secondary-gray: #666666;
+            --light-gray: #f7f7f7;
+            --border-gray: #e0e0e0;
+        }
+        
+        /* 确保整个页面使用灰色主题 */
+        html {
+            filter: hue-rotate(60deg) grayscale(20%) !important;
+        }
+        
+        /* 针对特定棕色值的全局替换 */
+        [style*="127,78,22"] {
+            background-color: var(--primary-gray) !important;
+            border-color: var(--primary-gray) !important;
+            color: inherit !important;
+            fill: var(--primary-gray) !important;
+            stroke: var(--primary-gray) !important;
+        }
+        
+        /* 确保所有交互元素使用灰色 */
+        a:hover, a:focus {
+            color: var(--primary-gray) !important;
+        }
+        
+        /* 覆盖LayUI框架的样式 */
+        .layui-layer-title {
+            background-color: var(--primary-gray) !important;
+            color: white !important;
+        }
+        
+        /* 确保表格使用灰色主题 */
+        table th {
+            background-color: var(--light-gray) !important;
+            color: var(--secondary-gray) !important;
+        }
+        
+        /* 确保图表和图标使用灰色 */
+        .iconfont {
+            color: var(--secondary-gray) !important;
+        }
+        
+        /* 添加一个主题指示器 */
+        .gray-theme-notice {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: var(--primary-gray);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <div class="gray-theme-notice">灰色主题模式</div>
+    
+    <!-- 直接加载原始页面的内容 -->
+    <div id="original-content"></div>
+    
+    <script src="../../layui/layui.js"></script>
+    <script src="../../js/jquery.min.js"></script>
+    <script src="../../js/bootstrap.min.js"></script>
+    
+    <!-- 引入专门的棕色到灰色替换器脚本 -->
+    <script src="../../js/brown-to-gray-replacer.js"></script>
+    
+    <script>
+        // 加载原始页面内容
+        $(document).ready(function() {
+            console.log('灰色主题页面已加载，准备替换棕色元素');
+            
+            // 加载原始list.html的内容
+            $.get("list.html", function(data) {
+                console.log('已获取原始页面内容');
+                
+                // 过滤掉HTML头部和脚本部分，只保留body内容
+                const bodyContent = $(data).find('body').html();
+                $('#original-content').html(bodyContent);
+                
+                // 延迟执行以确保内容完全加载后再应用样式替换
+                setTimeout(function() {
+                    console.log('开始执行棕色到灰色的替换');
+                    
+                    // 检查是否已加载brownToGrayReplacer并手动触发一次替换
+                    if (window.initBrownToGrayReplacer) {
+                        console.log('检测到brown-to-gray-replacer.js已加载，执行初始化');
+                        initBrownToGrayReplacer();
+                    } else {
+                        console.log('未检测到brown-to-gray-replacer.js，执行备用替换方案');
+                        // 备用替换方案：查找并替换所有内联样式中的特定棕色值
+                        document.querySelectorAll('[style*="127,78,22"]').forEach(element => {
+                            let style = element.getAttribute('style');
+                            // 替换背景色
+                            style = style.replace(/background-color:\s*rgba\(127,\s*78,\s*22[^)]*\)/gi, 'background-color: #454545');
+                            // 替换边框色
+                            style = style.replace(/border-color:\s*rgba\(127,\s*78,\s*22[^)]*\)/gi, 'border-color: #454545');
+                            // 替换文字颜色
+                            style = style.replace(/color:\s*rgba\(127,\s*78,\s*22[^)]*\)/gi, 'color: #454545');
+                            element.setAttribute('style', style);
+                        });
+                    }
+                }, 500);
+            }).fail(function() {
+                console.error('无法加载原始页面内容');
+                alert('无法加载原始页面内容，请稍后再试。');
+            });
+        });
+    </script>
+</body>
+</html>

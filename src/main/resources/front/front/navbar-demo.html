@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会优居租房 - 导航栏演示</title>
+    <link rel="stylesheet" href="./layui/css/layui.css">
+    <script src="./js/vue.js"></script>
+    <style type="text/css">
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        #header {
+            height: auto;
+            background: transparent;
+            border-bottom: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        #header .nav-top {
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            font-size: 16px;
+            color: #2a8a15;
+            box-sizing: border-box;
+            height: 70px;
+            background: linear-gradient(135deg, #333333 0%, #1a1a1a 100%);
+            box-shadow: 0 4px 25px rgba(0,0,0,0.35);
+            justify-content: space-between;
+            position: relative;
+            border-radius: 8px;
+            max-width: 1200px;
+            margin: 20px auto;
+            width: calc(100% - 40px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        #header .nav-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        #header .nav-content .nav-top-title {
+            line-height: 70px;
+            font-size: 22px;
+            font-weight: 700;
+            color: white;
+            padding: 0;
+            margin: 0;
+            border-radius: 0;
+            border-width: 0;
+            border-style: solid;
+            border-color: transparent;
+            box-shadow: none;
+            letter-spacing: 1px;
+        }
+
+        #header .nav-content .nav-top-title span {
+            color: #64b5f6;
+        }
+
+        #header .nav-content .navs {
+            display: flex;
+            padding: 0;
+            align-items: center;
+            box-sizing: border-box;
+            height: 70px;
+            background: transparent;
+            box-shadow: none;
+            justify-content: flex-end;
+            margin: 0;
+        }
+
+        #header .nav-content .navs li {
+            display: inline-block;
+            width: auto;
+            line-height: 70px;
+            padding: 0;
+            margin: 0 15px;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 16px;
+            border-radius: 0;
+            border-width: 0;
+            border-style: solid;
+            border-color: transparent;
+            background-color: transparent;
+            box-shadow: none;
+            text-align: center;
+        }
+        
+        #header .nav-content .navs li a{
+            color: inherit;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            padding: 10px 20px;
+            display: inline-block;
+            border-radius: 4px;
+            position: relative;
+        }
+        
+        #header .nav-content .navs li.current a{
+            color: white;
+        }
+        
+        #header .nav-content .navs li a:hover{
+            color: white;
+        }
+        
+        #header .nav-content .navs li.current {
+            color: white;
+            font-size: 16px;
+            border-radius: 0;
+            border-width: 0;
+            border-style: solid;
+            border-color: transparent;
+            background-color: transparent;
+            box-shadow: none;
+        }
+        
+        #header .nav-content .navs li:hover {
+            color: white;
+            font-size: 16px;
+            border-radius: 0;
+            border-width: 0;
+            border-style: solid;
+            border-color: transparent;
+            background-color: transparent;
+            box-shadow: none;
+        }
+        
+        #header .nav-content .navs li a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            background-color: #64b5f6;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        #header .nav-content .navs li a:hover::after {
+            width: 80%;
+        }
+        
+        #header .nav-content .navs li.current a::after {
+            width: 80%;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            #header .nav-top {
+                flex-direction: column;
+                height: auto;
+                padding: 20px;
+                margin: 10px;
+                width: calc(100% - 20px);
+            }
+            
+            #header .nav-content {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            #header .nav-content .nav-top-title {
+                margin-bottom: 15px;
+                line-height: normal;
+            }
+            
+            #header .nav-content .navs {
+                width: 100%;
+                justify-content: space-around;
+            }
+            
+            #header .nav-content .navs li {
+                margin: 0;
+                line-height: normal;
+            }
+            
+            #header .nav-content .navs li a {
+                padding: 8px 15px;
+                font-size: 15px;
+            }
+        }
+        
+        .content {
+            padding-top: 120px;
+            text-align: center;
+            color: #333;
+        }
+        
+        .content h2 {
+            color: #1e3c72;
+            margin-bottom: 20px;
+        }
+        
+        .content p {
+            max-width: 800px;
+            margin: 0 auto 20px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <div id="header">
+        <div v-if='true' class="nav-top">
+          <div class="nav-content">
+            <div v-if="true" class="nav-top-title"><span>优居租房</span></div>
+            <div class="navs">
+              <div class="list">
+                  <ul>
+                      <li class='current'><a href="#" class="menumain">首页</a></li>
+                      <li><a href="#" class="menumain" style="cursor: pointer;">房屋资讯</a></li>
+                      <li><a href="#" class="menumain">个人中心</a></li>
+                      <li><a href="#" class="menumain" style="cursor: pointer;">后台管理</a></li>
+                  </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+    
+    <div class="content">
+        <h2>导航栏演示页面</h2>
+        <p>这是一个演示页面，展示了修改后的导航栏效果。</p>
+        <p>导航栏使用了蓝色渐变背景，具有现代化的悬停效果和响应式设计。</p>
+        <p>Logo部分已更新为"会优居租房"，并添加了特殊样式处理。</p>
+    </div>
+
+    <script>
+        // 创建一个简单的Vue实例来处理数据绑定
+        new Vue({
+            el: '#header',
+            data: {
+                projectName: '会优居租房'
+            }
+        });
+    </script>
+</body>
+</html>

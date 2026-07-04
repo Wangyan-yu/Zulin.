@@ -1,0 +1,191 @@
+/* 全局样式覆盖，确保所有元素使用灰色系颜色，替换所有棕色为灰色 */
+
+/* 提升CSS优先级，使用!important确保覆盖所有样式 */
+*:not(style):not(script) {
+    /* 使用CSS变量便于统一管理 */
+    --primary-gray: #454545 !important;
+    --secondary-gray: #666666 !important;
+    --light-gray: #f7f7f7 !important;
+    --border-gray: #e0e0e0 !important;
+}
+
+/* 基础元素灰色覆盖 */
+.layui-nav .layui-this:after,
+.layui-nav-bar,
+.layui-nav-tree .layui-nav-itemed:after {
+    background-color: var(--primary-gray) !important;
+}
+
+.layui-nav .layui-nav-item a:hover {
+    color: #FFFFFF !important;
+    background-color: var(--primary-gray) !important;
+}
+
+.layui-nav .layui-nav-child dd.layui-this a,
+.layui-nav-child dd.layui-this {
+    background-color: var(--primary-gray) !important;
+}
+
+.layui-nav-tree .layui-nav-child dd.layui-this, 
+.layui-nav-tree .layui-nav-child dd.layui-this a, 
+.layui-nav-tree .layui-this, 
+.layui-nav-tree .layui-this>a, 
+.layui-nav-tree .layui-this>a:hover {
+    background-color: var(--primary-gray) !important;
+    color: #fff !important;
+}
+
+/* 轮播图灰色覆盖 */
+.layui-carousel-ind li.layui-this {
+    background-color: var(--primary-gray) !important;
+}
+
+/* 标题栏灰色覆盖 */
+.index-title {
+    color: var(--primary-gray) !important;
+}
+
+.title {
+    background-color: var(--primary-gray) !important;
+    color: white !important;
+}
+
+/* 导航栏灰色覆盖 */
+.nav {
+    background-color: var(--light-gray) !important;
+}
+
+.nav-bottom {
+    background: var(--primary-gray) !important;
+}
+
+/* 按钮灰色覆盖 */
+.btn-primary,
+.layui-btn,
+.btn-submit,
+.btn-theme {
+    background-color: var(--primary-gray) !important;
+    color: white !important;
+}
+
+/* 论坛相关样式灰色覆盖 */
+.forum-container .bottom-container .btn {
+    background: var(--primary-gray) !important;
+    color: #FFFFFF !important;
+}
+
+.forum-container .forum-list .forum-item:hover {
+    background: var(--primary-gray) !important;
+    color: #FFFFFF !important;
+}
+
+.forum-container .forum-list .forum-item.line:hover {
+    background: var(--primary-gray) !important;
+    color: #FFFFFF !important;
+}
+
+/* 新闻相关样式灰色覆盖 */
+.news-container .news-list .news-item .detail-container .h2 {
+    color: var(--secondary-gray) !important;
+}
+
+.news-container .bottom-container .btn {
+    background: var(--primary-gray) !important;
+    color: #FFFFFF !important;
+}
+
+.news-home-container .layui-colla-title:hover {
+    background: var(--primary-gray) !important;
+    color: #FFFFFF !important;
+}
+
+/* 数据列表相关样式灰色覆盖 */
+.data-container .data-list .data-item:hover {
+    border: 1px solid var(--primary-gray) !important;
+}
+
+.data-container .data-list .data-item .title:hover {
+    background: var(--primary-gray) !important;
+}
+
+/* 分页插件灰色覆盖 */
+.layui-laypage .layui-laypage-curr .layui-laypage-em {
+    background-color: var(--primary-gray) !important;
+}
+
+.layui-laypage a:hover {
+    color: var(--primary-gray) !important;
+}
+
+/* 表单元素灰色覆盖 */
+.layui-form-radio>i:hover, .layui-form-radioed>i {
+    color: var(--primary-gray) !important;
+}
+
+.layui-form-select dl dd.layui-this {
+    background-color: var(--primary-gray) !important;
+    color: #fff !important;
+}
+
+.layui-tab-brief>.layui-tab-title .layui-this {
+    color: var(--primary-gray) !important;
+}
+
+.layui-tab-brief>.layui-tab-more li.layui-this:after, 
+.layui-tab-brief>.layui-tab-title .layui-this:after {
+    border-bottom: 2px solid var(--primary-gray) !important;
+}
+
+/* 个人中心样式灰色覆盖 */
+.center-container .layui-nav-tree .layui-nav-bar {
+    background-color: var(--primary-gray) !important;
+}
+
+/* 全局颜色替换 - 所有棕色相关颜色替换为灰色 */
+[style*="brown"],
+[style*="#8B4513"], /* 棕色 */
+[style*="#A0522D"], /* 红棕色 */
+[style*="#CD853F"], /* 秘鲁色 */
+[style*="#DEB887"], /* burlywood */
+[style*="#D2B48C"], /* 棕褐色 */
+[style*="#BC8F8F"], /* 玫瑰棕色 */
+[style*="#F4A460"], /* 沙棕色 */
+[style*="#DAA520"], /* 金黄色 */
+[style*="#B8860B"], /* 暗金黄色 */
+[style*="#FFDEAD"], /* 小麦色 */
+[style*="#7F4E16"], /* 特定棕色值 */
+[style*="127,78,22"], /* 特定的棕色值 */
+[style*="rgba(127,78,22"], /* 带透明度的特定棕色值 */
+[style*="rgb(127,78,22"]  /* 不带透明度的特定棕色值 */
+{
+    background-color: var(--primary-gray) !important;
+    border-color: var(--primary-gray) !important;
+    color: inherit !important;
+    fill: var(--primary-gray) !important;
+}
+
+/* 针对内联样式中的特定棕色值进行更精确的替换 */
+*[style*="background-color: rgba(127,78,22"] {
+    background-color: var(--primary-gray) !important;
+}
+
+*[style*="border-color: rgba(127,78,22"] {
+    border-color: var(--primary-gray) !important;
+}
+
+*[style*="color: rgba(127,78,22"] {
+    color: var(--primary-gray) !important;
+}
+
+*[style*="box-shadow"][style*="127,78,22"] {
+    box-shadow: 0 0 6px rgba(69, 69, 69, 0.5) !important;
+}
+
+/* 直接样式替换 - 确保没有棕色元素 */
+* {
+    --brown: var(--primary-gray) !important;
+    --chocolate: var(--primary-gray) !important;
+    --sienna: var(--primary-gray) !important;
+    --tan: var(--primary-gray) !important;
+    --wood: var(--primary-gray) !important;
+}

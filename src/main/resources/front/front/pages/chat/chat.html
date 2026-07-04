@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>在线客服</title>
+	<link rel="stylesheet" type="text/css" href="../../elementui/elementui.css" />
+	<style>
+		html,body,#app { height: 100%; margin: 0; }
+		.chat-form { height: 100%; display: flex; flex-direction: column; }
+		.chat-content { flex: 1; overflow-y: auto; padding: 20px; }
+		.message-item { margin-bottom: 15px; }
+		.user-message { text-align: right; }
+		.ai-message { text-align: left; }
+		.message-bubble {
+			display: inline-block;
+			padding: 10px 15px;
+			border-radius: 18px;
+			max-width: 70%;
+		}
+		.user-bubble { background: #409EFF; color: white; }
+		.ai-bubble { background: #f0f0f0; color: #333; }
+		.chat-input { padding: 20px; background: #f5f7fa; border-top: 1px solid #e4e7ed; display: flex; }
+		.input-area { flex: 1; margin-right: 10px; background: #e6eef8; }
+		.debug-info { padding: 10px; background: #60d4ec; margin: 10px; border-radius: 4px; font-size: 12px; }
+	</style>
+</head>
+<body>
+<div id="app">
+	<el-form class="chat-form" ref="ruleForm" label-width="0">
+		<div class="chat-content" ref="chatContent">
+			<!-- 调试信息 -->
+			<div class="debug-info" v-if="debugInfo">
+				调试信息: {{ debugInfo }}
+			</div>
+
+			<div v-for="item in dataList" :key="item.id" :class="['message-item', item.ask ? 'user-message' : 'ai-message']">
+				<div :class="['message-bubble', item.ask ? 'user-bubble' : 'ai-bubble']">
+					<div v-if="item.ask"><strong>用户:</strong> {{ item.ask }}</div>
+					<div v-else><strong>AI客服:</strong> {{ item.reply }}</div>
+					<div style="font-size: 12px; color: #666; margin-top: 5px;">
+						{{ formatTime(item.addtime) }}
+					</div>
+				</div>
+			</div>
+
+			<div v-if="loading" style="text-align: center; padding: 20px;">
+				<el-icon class="is-loading"><Loading /></el-icon>
+				<span>AI正在思考中...</span>
+			</div>
+		</div>
+
+		<div class="chat-input">
+			<el-input
+					class="input-area"
+					v-model="ruleForm.ask"
+					placeholder="请输入您的问题..."
+					:disabled="loading"
+					clearable>
+			</el-input>
+			<el-button
+					type="primary"
+					:loading="loading"
+					:disabled="!ruleForm.ask || loading"
+					@click="onSubmit">
+				发送
+			</el-button>
+
+			<!-- 添加模式切换按钮 -->
+			<el-button
+					type="info"
+					style="margin-left: 10px;"
+					@click="toggleMode">
+				{{ useAIMode ? 'AI模式' : '普通模式' }}
+			</el-button>
+		</div>
+	</el-form>
+</div>
+
+<script src="../../layui/layui.js"></script>
+<script src="../../js/vue.js"></script>
+<script src="../../elementui/elementui.js"></script>
+<script src="../../js/config.js"></script>
+<script src="../../modules/config.js"></script>
+<script src="../../js/utils.js"></script>
+
+<script type="text/javascript">
+	// 先初始化layui的模块
+	layui.use(['layer', 'http'], function() {
+		var layer = layui.layer;
+		var http = layui.http;
+		
+		// 在layui模块加载完成后再创建Vue实例
+		var app = new Vue({
+			el: "#app",
+			data() {
+				return {
+					ruleForm: { ask: "" },
+					dataList: [],
+					loading: false,
+					debugInfo: "",
+					useAIMode: true, // 默认使用AI模式
+					isLocalDev: true // 本地开发模式标记
+				}
+			},
+			mounted() {
+				this.init();
+			},
+			methods: {
+				init() {
+					// 在本地开发模式下，不检查登录状态，直接使用模拟数据
+					if (this.isLocalDev) {
+						this.debugInfo = "开发模式 - 显示示例聊天内容";
+						this.loadMockData();
+						return;
+					}
+					
+					var userTable = localStorage.getItem('userTable');
+					var userId = localStorage.getItem('userid');
+
+					this.debugInfo = "用户表: " + userTable + ", 用户ID: " + userId + ", 模式: " + (this.useAIMode ? "AI模式" : "普通模式");
+
+					if (!userId) {
+						this.debugInfo += " - 用户未登录";
+						alert("请先登录！");
+						window.location.href = '../../pages/login/login.html';
+						return;
+					}
+
+					this.getChatList();
+				},
+
+				// 加载模拟数据
+				loadMockData() {
+					this.dataList = [
+						{
+							id: 1,
+							userid: 1,
+							ask: "请问如何查询房源信息？",
+							reply: "您好！您可以通过首页的搜索框，输入地区、价格等条件来查询房源。",
+							addtime: "2023-11-10 10:30:00",
+							status: 1
+						},
+						{
+							id: 2,
+							userid: 1,
+							ask: "租房需要准备什么材料？",
+							reply: "租房通常需要准备身份证、工作证明和收入证明等材料。",
+							addtime: "2023-11-10 10:35:00",
+							status: 1
+						}
+					];
+					this.scrollToBottom();
+				},
+
+				toggleMode() {
+					this.useAIMode = !this.useAIMode;
+					this.debugInfo = "切换到: " + (this.useAIMode ? "AI模式" : "普通模式");
+					this.$message.info(this.useAIMode ? "已切换到AI客服模式" : "已切换到普通客服模式");
+				},
+
+				getChatList() {
+					if (this.isLocalDev) {
+						this.loadMockData();
+						return;
+					}
+					
+					var userId = localStorage.getItem('userid');
+					console.log("获取聊天记录，用户ID:", userId);
+
+					layui.http.request('chat/list', 'get', {
+						userid: userId,
+						sort: 'addtime',
+						order: 'asc',
+						limit: 50
+					}, (res) => {
+						console.log("聊天记录响应:", res);
+						if (res.code === 0) {
+							this.dataList = res.data.list || [];
+							this.scrollToBottom();
+						} else {
+							this.debugInfo = "获取记录失败: " + res.msg;
+						}
+					}, (error) => {
+						console.error("获取记录错误:", error);
+						this.debugInfo = "网络错误: " + error;
+					});
+				},
+
+				onSubmit() {
+					if (!this.ruleForm.ask.trim()) {
+						this.$message.warning('请输入问题内容');
+						return;
+					}
+
+					this.loading = true;
+					var question = this.ruleForm.ask.trim();
+					this.ruleForm.ask = "";
+
+					if (this.isLocalDev) {
+						// 在本地开发模式下，使用模拟回复
+						this.debugInfo = "开发模式 - 模拟" + (this.useAIMode ? "AI" : "普通") + "回复";
+						this.showMockReply(question);
+						return;
+					}
+
+					if (this.useAIMode) {
+						this.debugInfo = "AI模式 - 发送问题: " + question;
+						console.log("发送AI请求到 addWithDeepseek:", question);
+						this.sendToAI(question);
+					} else {
+						this.debugInfo = "普通模式 - 发送问题: " + question;
+						console.log("发送普通请求到 add:", question);
+						this.sendNormal(question);
+					}
+				},
+
+				// 显示模拟回复
+				showMockReply(question) {
+					// 简单的关键词匹配生成模拟回复
+					let mockReply = '感谢您的提问！这是开发模式下的模拟回复。';
+					if (question.includes('房源') || question.includes('房子') || question.includes('租房')) {
+						mockReply = '我们有大量优质房源可供选择，您可以在网站首页查看详细信息，或者联系我们的客服获取更多帮助。';
+					} else if (question.includes('价格') || question.includes('租金')) {
+						mockReply = '不同地区和房型的价格有所不同，您可以使用我们的筛选功能，根据预算查看合适的房源。';
+					} else if (question.includes('合同') || question.includes('签约')) {
+						mockReply = '签约流程简单快捷，您只需准备好身份证明和收入证明，我们的工作人员会为您提供全程指导。';
+					}
+					
+					// 添加用户的问题到聊天列表
+					this.dataList.push({
+						id: Date.now(),
+						userid: 1,
+						ask: question,
+						reply: '',
+						addtime: new Date().toLocaleString('zh-CN'),
+						status: 0
+					});
+					
+					// 模拟AI思考延迟
+					setTimeout(() => {
+						// 添加AI的回复到聊天列表
+						this.dataList[this.dataList.length - 1].reply = mockReply;
+						this.dataList[this.dataList.length - 1].status = 1;
+						this.loading = false;
+						this.scrollToBottom();
+						this.$message.success('消息已发送，AI已回复');
+					}, 1000);
+				},
+
+				// 发送到AI接口
+				sendToAI(question) {
+					layui.http.requestJson('chat/addWithDeepseek', 'post', {
+						ask: question
+					}, (res) => {
+						console.log("AI响应:", res);
+						this.loading = false;
+
+						if (res.code === 0) {
+							this.debugInfo = "AI模式 - 发送成功，等待AI回复...";
+							this.$message.success('消息已发送，AI正在回复');
+							// 3秒后刷新列表，给AI一些处理时间
+							setTimeout(() => {
+								this.getChatList();
+							}, 3000);
+						} else {
+							this.debugInfo = "AI模式 - 发送失败: " + res.msg;
+							this.$message.error(res.msg || '发送失败');
+						}
+					}, (error) => {
+						console.error("AI请求失败:", error);
+						this.loading = false;
+						this.debugInfo = "AI请求错误: " + error;
+						this.$message.error('AI服务暂时不可用');
+					});
+				},
+
+				// 发送到普通接口
+				sendNormal(question) {
+					layui.http.requestJson('chat/add', 'post', {
+						ask: question
+					}, (res) => {
+						console.log("普通响应:", res);
+						this.loading = false;
+
+						if (res.code === 0) {
+							this.debugInfo = "普通模式 - 发送成功";
+							this.$message.success('消息已发送，等待客服回复');
+							// 立即刷新列表
+							setTimeout(() => {
+								this.getChatList();
+							}, 1000);
+						} else {
+							this.debugInfo = "普通模式 - 发送失败: " + res.msg;
+							this.$message.error(res.msg || '发送失败');
+						}
+					}, (error) => {
+						console.error("普通请求失败:", error);
+						this.loading = false;
+						this.debugInfo = "普通请求错误: " + error;
+						this.$message.error('发送失败');
+					});
+				},
+
+				formatTime(timeStr) {
+					if (!timeStr) return '';
+					return typeof timeStr === 'string' ? timeStr : '未知时间';
+				},
+
+				scrollToBottom() {
+					this.$nextTick(() => {
+						const container = this.$refs.chatContent;
+						if (container) {
+							container.scrollTop = container.scrollHeight;
+						}
+					});
+				}
+			}
+		});
+	});
+</script>
+</body>
+</html>

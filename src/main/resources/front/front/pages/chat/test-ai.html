@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>AI测试页面</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        input, button { padding: 10px; margin: 5px; }
+        #result { margin-top: 20px; padding: 10px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>AI接口测试</h1>
+    <input type="text" id="question" placeholder="输入测试问题" style="width: 300px;">
+    <button onclick="testAPI()">测试接口</button>
+    <button onclick="testDirect()">直接测试</button>
+
+    <div id="result">
+        <h3>测试结果:</h3>
+        <div id="output">等待测试...</div>
+    </div>
+</div>
+
+<script>
+    function testAPI() {
+        var question = document.getElementById('question').value || '你好';
+        var output = document.getElementById('output');
+
+        output.innerHTML = '发送请求中...';
+
+        fetch('/springbootyjn76/chat/addWithDeepseek', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ask: question})
+        })
+            .then(response => {
+                output.innerHTML += '<br>响应状态: ' + response.status;
+                return response.json();
+            })
+            .then(data => {
+                output.innerHTML += '<br>响应数据: ' + JSON.stringify(data);
+            })
+            .catch(error => {
+                output.innerHTML += '<br>错误: ' + error;
+            });
+    }
+
+    function testDirect() {
+        var output = document.getElementById('output');
+        output.innerHTML = '直接访问测试...';
+
+        // 直接访问列表接口测试连接
+        fetch('/springbootyjn76/chat/list?userid=1&limit=5')
+            .then(response => {
+                output.innerHTML += '<br>列表接口状态: ' + response.status;
+                return response.json();
+            })
+            .then(data => {
+                output.innerHTML += '<br>列表数据: ' + JSON.stringify(data);
+            })
+            .catch(error => {
+                output.innerHTML += '<br>列表错误: ' + error;
+            });
+    }
+</script>
+</body>
+</html>

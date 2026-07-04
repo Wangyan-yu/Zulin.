@@ -1,0 +1,70 @@
+server:
+  tomcat:
+    uri-encoding: UTF-8
+  port: 8080
+  servlet:
+    context-path: /springbootyjn76
+
+spring:
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/springbootyjn76?useUnicode=true&characterEncoding=utf-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2B8&useSSL=false
+    username: root
+    password: 989863
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  # 删除这行：static-locations: classpath:static/,file:static/
+  web:
+    resources:
+      static-locations:
+        - classpath:/front/front/  # 您的自定义路径放在第一位
+        - classpath:/static/
+        - classpath:/public/
+        - file:static/
+  mvc:
+    static-path-pattern: /**
+
+mybatis-plus:
+  mapper-locations: classpath*:mapper/*.xml
+  typeAliasesPackage: com.entity
+  global-config:
+    id-type: 1
+    field-strategy: 2
+    db-column-underline: true
+    refresh-mapper: true
+    logic-delete-value: -1
+    logic-not-delete-value: 0
+    sql-injector: com.baomidou.mybatisplus.mapper.LogicSqlInjector
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    call-setters-on-nulls: true
+    jdbc-type-for-null: 'null'
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+
+deepseek:
+  key: sk-64a55ec5b0a940a090186a0a052f68be
+
+# 高德地图配置
+amap:
+  # 高德地图API密钥
+  key: "2e498ee218e77061af77aaa692910ebc"
+  # 高德地图服务基础URL
+  base-url: https://restapi.amap.com
+  # 逆地理编码接口路径
+  regeo-path: /v3/geocode/regeo
+  # 地理编码接口路径
+  geo-path: /v3/geocode/geo
+  # 距离计算接口路径
+  distance-path: /v3/distance

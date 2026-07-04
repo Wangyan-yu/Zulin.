@@ -1,0 +1,26 @@
+/* 全局样式覆盖 - 将棕色替换为灰色 */
+
+/* 导航栏相关样式覆盖 */
+.header-brown {
+  background-color: #454545 !important;
+}
+
+/* 按钮相关样式覆盖 */
+.btn-brown {
+  background-color: #454545 !important;
+}
+
+/* 边框相关样式覆盖 */
+.border-brown {
+  border-color: #454545 !important;
+}
+
+/* 文字颜色相关样式覆盖 */
+.text-brown {
+  color: #454545 !important;
+}
+
+/* 链接相关样式覆盖 */
+.link-brown {
+  color: #454545 !important;
+}
